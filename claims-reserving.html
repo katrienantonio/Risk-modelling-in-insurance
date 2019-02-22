@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>6 Claims reserving | Risk Modelling in Insurance : a collection of computer labs in R</title>
+  <meta name="description" content="Tutorials for the course of Loss Models">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="6 Claims reserving | Risk Modelling in Insurance : a collection of computer labs in R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Tutorials for the course of Loss Models" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="6 Claims reserving | Risk Modelling in Insurance : a collection of computer labs in R" />
+  
+  <meta name="twitter:description" content="Tutorials for the course of Loss Models" />
+  
+
+<meta name="author" content="Katrien Antonio and Jonas Crevecoeur">
+
+
+<meta name="date" content="2019-01-13">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="glms.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+<script>
+$(document).ready(function() {
+
+  $chunks = $('.fold');
+
+  $chunks.each(function () {
+
+    // add button to source code chunks
+      $(this).prepend("<div class=\"showopt\">Show Solution</div><br style=\"line-height:22px;\"/>");
+ 
+	$child = $(this).children('div');
+	$child.each(function(){
+		$(this).children('').attr('class', 'folded');
+	});
+	$(this).children('pre').attr('class', 'folded');
+	$(this).children('p').attr('class', 'folded');
+   });
+
+  // hide all chunks when document is loaded
+  $('.folded').css('display', 'none')
+
+  // function to toggle the visibility
+  $('.showopt').click(function() {
+    var label = $(this).html();
+    if (label.indexOf("Show") >= 0) {
+      $(this).html(label.replace("Show", "Hide"));
+    } else {
+      $(this).html(label.replace("Hide", "Show"));
+    }
+    	$child = $(this).siblings('div');
+	$child.each(function(){
+		$(this).children('pre').slideToggle('fast', 'swing');
+	});
+	$(this).siblings('pre').slideToggle('fast', 'swing');
+	$(this).siblings('p').slideToggle('fast', 'swing');
+  });
+});
+</script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Intro</a></li>
+<li class="chapter" data-level="2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html"><i class="fa fa-check"></i><b>2</b> Simple, parametric distributions for frequency and severity data</a><ul>
+<li class="chapter" data-level="2.1" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#the-exponential-distribution"><i class="fa fa-check"></i><b>2.1</b> The exponential distribution</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#simulating-data"><i class="fa fa-check"></i><b>2.1.1</b> Simulating data</a></li>
+<li class="chapter" data-level="2.1.2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#exploratory-analysis"><i class="fa fa-check"></i><b>2.1.2</b> Exploratory analysis</a></li>
+<li class="chapter" data-level="2.1.3" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#data-visualization-with-ggplot"><i class="fa fa-check"></i><b>2.1.3</b> Data visualization with ggplot</a></li>
+<li class="chapter" data-level="2.1.4" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#maximum-likelihood-estimation-mle"><i class="fa fa-check"></i><b>2.1.4</b> Maximum Likelihood Estimation (MLE)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#discrete-distributions"><i class="fa fa-check"></i><b>2.2</b> Discrete distributions</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#simulating-the-data"><i class="fa fa-check"></i><b>2.2.1</b> Simulating the data</a></li>
+<li class="chapter" data-level="2.2.2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#exploratory-analysis-1"><i class="fa fa-check"></i><b>2.2.2</b> Exploratory analysis</a></li>
+<li class="chapter" data-level="2.2.3" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#maximum-likelihood-estimation-mle-1"><i class="fa fa-check"></i><b>2.2.3</b> Maximum Likelihood Estimation (MLE)</a></li>
+<li class="chapter" data-level="2.2.4" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#comparing-fitted-models"><i class="fa fa-check"></i><b>2.2.4</b> Comparing fitted models</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html"><i class="fa fa-check"></i><b>3</b> Putting it all together: case-study on modelling claim counts</a><ul>
+<li class="chapter" data-level="3.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#read-in-data"><i class="fa fa-check"></i><b>3.1</b> Read in data</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#determining-the-file-path"><i class="fa fa-check"></i><b>3.1.1</b> Determining the file path</a></li>
+<li class="chapter" data-level="3.1.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#importing-a-.txt-file"><i class="fa fa-check"></i><b>3.1.2</b> Importing a .txt file</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#exploratory-analysis-2"><i class="fa fa-check"></i><b>3.2</b> Exploratory analysis</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#summary-statistics-disregarding-exposure"><i class="fa fa-check"></i><b>3.2.1</b> Summary statistics disregarding exposure</a></li>
+<li class="chapter" data-level="3.2.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#summary-statistics-taking-into-account-exposure"><i class="fa fa-check"></i><b>3.2.2</b> Summary statistics taking into account exposure</a></li>
+<li class="chapter" data-level="3.2.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#empirical-probability-distribution"><i class="fa fa-check"></i><b>3.2.3</b> Empirical probability distribution</a></li>
+<li class="chapter" data-level="3.2.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#the-a-b-0-class-of-distributions"><i class="fa fa-check"></i><b>3.2.4</b> The (a, b, 0) class of distributions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#fitting-count-distributions"><i class="fa fa-check"></i><b>3.3</b> Fitting count distributions</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#poisson"><i class="fa fa-check"></i><b>3.3.1</b> Poisson</a></li>
+<li class="chapter" data-level="3.3.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#negative-binomial-1"><i class="fa fa-check"></i><b>3.3.2</b> Negative binomial</a></li>
+<li class="chapter" data-level="3.3.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#modified-poisson-distributions"><i class="fa fa-check"></i><b>3.3.3</b> Modified Poisson distributions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#aic-1"><i class="fa fa-check"></i><b>3.4</b> AIC</a></li>
+<li class="chapter" data-level="3.5" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#replicating-data-sets"><i class="fa fa-check"></i><b>3.5</b> Replicating data sets</a><ul>
+<li class="chapter" data-level="3.5.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#poisson-1"><i class="fa fa-check"></i><b>3.5.1</b> Poisson</a></li>
+<li class="chapter" data-level="3.5.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#nb"><i class="fa fa-check"></i><b>3.5.2</b> NB</a></li>
+<li class="chapter" data-level="3.5.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#zip"><i class="fa fa-check"></i><b>3.5.3</b> ZIP</a></li>
+<li class="chapter" data-level="3.5.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#hurdle-poisson-1"><i class="fa fa-check"></i><b>3.5.4</b> Hurdle Poisson</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#mean-and-variance-of-the-estimated-zip-nb-hurdle-poisson"><i class="fa fa-check"></i><b>3.6</b> Mean and variance of the estimated ZIP, NB, Hurdle Poisson</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#poisson-2"><i class="fa fa-check"></i><b>3.6.1</b> Poisson</a></li>
+<li class="chapter" data-level="3.6.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#nb-1"><i class="fa fa-check"></i><b>3.6.2</b> NB</a></li>
+<li class="chapter" data-level="3.6.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#zip-1"><i class="fa fa-check"></i><b>3.6.3</b> ZIP</a></li>
+<li class="chapter" data-level="3.6.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#hurdle-poisson-2"><i class="fa fa-check"></i><b>3.6.4</b> Hurdle Poisson</a></li>
+<li class="chapter" data-level="3.6.5" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#comparison-with-empirical-mean-and-variance"><i class="fa fa-check"></i><b>3.6.5</b> Comparison with empirical mean and variance</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#conclusion"><i class="fa fa-check"></i><b>3.7</b> Conclusion</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="simulation.html"><a href="simulation.html"><i class="fa fa-check"></i><b>4</b> Simulation</a><ul>
+<li class="chapter" data-level="4.1" data-path="simulation.html"><a href="simulation.html#severity"><i class="fa fa-check"></i><b>4.1</b> Severity</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="simulation.html"><a href="simulation.html#probability-integral-transform"><i class="fa fa-check"></i><b>4.1.1</b> Probability integral transform</a></li>
+<li class="chapter" data-level="4.1.2" data-path="simulation.html"><a href="simulation.html#visualization"><i class="fa fa-check"></i><b>4.1.2</b> Visualization</a></li>
+<li class="chapter" data-level="4.1.3" data-path="simulation.html"><a href="simulation.html#expected-loss-with-a-deductible"><i class="fa fa-check"></i><b>4.1.3</b> Expected loss with a deductible</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="simulation.html"><a href="simulation.html#aggregate-loss"><i class="fa fa-check"></i><b>4.2</b> Aggregate loss</a></li>
+<li class="chapter" data-level="4.3" data-path="simulation.html"><a href="simulation.html#simulating-future-life-times-of-newborns"><i class="fa fa-check"></i><b>4.3</b> Simulating future life times of newborns</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="simulation.html"><a href="simulation.html#importing-the-data"><i class="fa fa-check"></i><b>4.3.1</b> Importing the data</a></li>
+<li class="chapter" data-level="4.3.2" data-path="simulation.html"><a href="simulation.html#simulate-the-whole-life-time"><i class="fa fa-check"></i><b>4.3.2</b> Simulate the whole life time</a></li>
+<li class="chapter" data-level="4.3.3" data-path="simulation.html"><a href="simulation.html#simulate-the-future-lifetime"><i class="fa fa-check"></i><b>4.3.3</b> Simulate the future lifetime</a></li>
+<li class="chapter" data-level="4.3.4" data-path="simulation.html"><a href="simulation.html#visualize-the-data"><i class="fa fa-check"></i><b>4.3.4</b> Visualize the data</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="glms.html"><a href="glms.html"><i class="fa fa-check"></i><b>5</b> Generalized Linear Models</a><ul>
+<li class="chapter" data-level="5.1" data-path="glms.html"><a href="glms.html#modelling-count-data-with-poisson-regression-models"><i class="fa fa-check"></i><b>5.1</b> Modelling count data with Poisson regression models</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="glms.html"><a href="glms.html#a-first-data-set"><i class="fa fa-check"></i><b>5.1.1</b> A first data set</a></li>
+<li class="chapter" data-level="5.1.2" data-path="glms.html"><a href="glms.html#fit-a-poisson-glm"><i class="fa fa-check"></i><b>5.1.2</b> Fit a Poisson GLM</a></li>
+<li class="chapter" data-level="5.1.3" data-path="glms.html"><a href="glms.html#the-use-of-exposure"><i class="fa fa-check"></i><b>5.1.3</b> The use of exposure</a></li>
+<li class="chapter" data-level="5.1.4" data-path="glms.html"><a href="glms.html#analysis-of-deviance-for-glms"><i class="fa fa-check"></i><b>5.1.4</b> Analysis of deviance for GLMs</a></li>
+<li class="chapter" data-level="5.1.5" data-path="glms.html"><a href="glms.html#an-example"><i class="fa fa-check"></i><b>5.1.5</b> An example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="glms.html"><a href="glms.html#overdispersed-poisson-regression"><i class="fa fa-check"></i><b>5.2</b> Overdispersed Poisson regression</a></li>
+<li class="chapter" data-level="5.3" data-path="glms.html"><a href="glms.html#negative-binomial-regression"><i class="fa fa-check"></i><b>5.3</b> Negative Binomial regression</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="claims-reserving.html"><a href="claims-reserving.html"><i class="fa fa-check"></i><b>6</b> Claims reserving</a><ul>
+<li class="chapter" data-level="6.1" data-path="claims-reserving.html"><a href="claims-reserving.html#goals"><i class="fa fa-check"></i><b>6.1</b> Goals</a></li>
+<li class="chapter" data-level="6.2" data-path="claims-reserving.html"><a href="claims-reserving.html#import-a-run-off-triangle"><i class="fa fa-check"></i><b>6.2</b> Import a run-off triangle</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="claims-reserving.html"><a href="claims-reserving.html#using-scan"><i class="fa fa-check"></i><b>6.2.1</b> Using <code>scan</code></a></li>
+<li class="chapter" data-level="6.2.2" data-path="claims-reserving.html"><a href="claims-reserving.html#using-the-chainladder-package"><i class="fa fa-check"></i><b>6.2.2</b> Using the <code>chainladder</code> package</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="claims-reserving.html"><a href="claims-reserving.html#macks-chain-ladder-calculations"><i class="fa fa-check"></i><b>6.3</b> Mack’s Chain-Ladder calculations</a></li>
+<li class="chapter" data-level="6.4" data-path="claims-reserving.html"><a href="claims-reserving.html#glm-analysis-of-a-run-off-triangle"><i class="fa fa-check"></i><b>6.4</b> GLM analysis of a run-off triangle</a></li>
+<li class="chapter" data-level="6.5" data-path="claims-reserving.html"><a href="claims-reserving.html#bootstrap-analysis"><i class="fa fa-check"></i><b>6.5</b> Bootstrap analysis</a></li>
+<li class="chapter" data-level="6.6" data-path="claims-reserving.html"><a href="claims-reserving.html#more-info"><i class="fa fa-check"></i><b>6.6</b> More info</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Risk Modelling in Insurance : a collection of computer labs in R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="claims-reserving" class="section level1">
+<h1><span class="header-section-number">6</span> Claims reserving</h1>
+<div id="goals" class="section level2">
+<h2><span class="header-section-number">6.1</span> Goals</h2>
+<p>You’ll focus on reserving analytics with run-off triangles, including the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>importing a run-off triangle</li>
+<li>visualizing the data in the triangle</li>
+<li>basic chain-ladder calculations: the Mack approach</li>
+<li>setting up a bootstrap analysis to simulate from the predictive distribution of the outstanding loss amount while incorporating parameter and process uncertainty.</li>
+</ol>
+</div>
+<div id="import-a-run-off-triangle" class="section level2">
+<h2><span class="header-section-number">6.2</span> Import a run-off triangle</h2>
+<div id="using-scan" class="section level3">
+<h3><span class="header-section-number">6.2.1</span> Using <code>scan</code></h3>
+<p>You can load a run-off triangle in many different ways. Here is a first strategy, using the <code>scan()</code> function in R.</p>
+<pre class="sourceCode r"><code class="sourceCode r">Xij &lt;-<span class="st"> </span><span class="kw">scan</span>(<span class="dt">n=</span><span class="dv">55</span>)
+<span class="dv">357848</span> <span class="dv">766940</span> <span class="dv">610542</span> <span class="dv">482940</span> <span class="dv">527326</span> <span class="dv">574398</span> <span class="dv">146342</span> <span class="dv">139950</span> <span class="dv">227229</span> <span class="dv">67948</span>
+<span class="dv">352118</span> <span class="dv">884021</span> <span class="dv">933894</span> <span class="dv">1183289</span> <span class="dv">445745</span> <span class="dv">320996</span> <span class="dv">527804</span> <span class="dv">266172</span> <span class="dv">425046</span>
+<span class="dv">290507</span> <span class="dv">1001799</span> <span class="dv">926219</span> <span class="dv">1016654</span> <span class="dv">750816</span> <span class="dv">146923</span> <span class="dv">495992</span> <span class="dv">280405</span>
+<span class="dv">310608</span> <span class="dv">1108250</span> <span class="dv">776189</span> <span class="dv">1562400</span> <span class="dv">272482</span> <span class="dv">352053</span> <span class="dv">206286</span>
+<span class="dv">443160</span> <span class="dv">693190</span> <span class="dv">991983</span> <span class="dv">769488</span> <span class="dv">504851</span> <span class="dv">470639</span>
+<span class="dv">396132</span> <span class="dv">937085</span> <span class="dv">847498</span> <span class="dv">805037</span> <span class="dv">705960</span>
+<span class="dv">440832</span> <span class="dv">847631</span> <span class="dv">1131398</span> <span class="dv">1063269</span>
+<span class="dv">359480</span> <span class="dv">1061648</span> <span class="dv">1443370</span>
+<span class="dv">376686</span> <span class="dv">986608</span>
+<span class="dv">344014</span></code></pre>
+<p><strong>Exercise</strong>:</p>
+<ul>
+<li>verify the structure of object <code>Xij</code>. What happened?</li>
+</ul>
+<p>You will now reshape the flat vector <code>Xij</code> into a data frame that can be used for claims reserving with GLMs.</p>
+<pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">length</span>(Xij)
+TT &lt;-<span class="st"> </span><span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>n))
+<span class="co"># row.nrs</span>
+i &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>TT, TT<span class="op">:</span><span class="dv">1</span>)
+<span class="co"># col.nrs</span>
+j &lt;-<span class="st"> </span><span class="kw">sequence</span>(TT<span class="op">:</span><span class="dv">1</span>)
+<span class="co"># calendar.nrs</span>
+c &lt;-<span class="st"> </span>i<span class="op">+</span>j<span class="dv">-1</span>
+<span class="co"># as.factor</span>
+i &lt;-<span class="st"> </span><span class="kw">as.factor</span>(i)
+j &lt;-<span class="st"> </span><span class="kw">as.factor</span>(j)
+c &lt;-<span class="st"> </span><span class="kw">as.factor</span>(c)
+<span class="co"># combine into a data frame</span>
+my_triangle_data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(Xij, i, j, c)</code></pre>
+<p><strong>Exercise</strong>:</p>
+<ul>
+<li>verify the structure of the resulting data frame</li>
+<li>inspect the first 10 rows using <code>head</code>.</li>
+</ul>
+<p>You now prepare some first visual inspections of the data stored in <code>my_triangle_data</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))
+<span class="kw">boxplot</span>(Xij <span class="op">~</span><span class="st"> </span>i, <span class="dt">col =</span> <span class="st">&quot;grey&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;Boxplot of payments vs AY&quot;</span>)
+<span class="kw">boxplot</span>(Xij <span class="op">~</span><span class="st"> </span>j, <span class="dt">col =</span> <span class="st">&quot;grey&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;Boxplot of payments vs DY&quot;</span>)
+<span class="kw">boxplot</span>(Xij <span class="op">~</span><span class="st"> </span>c, <span class="dt">col =</span> <span class="st">&quot;grey&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;Boxplot of payments vs CY&quot;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-94-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="using-the-chainladder-package" class="section level3">
+<h3><span class="header-section-number">6.2.2</span> Using the <code>chainladder</code> package</h3>
+<p>The <code>ChainLadder</code> package is a well-developed and highly useful package for claims reserving in R. Among others the package brings functions covering:</p>
+<ol style="list-style-type: decimal">
+<li>Mack chain-ladder, Munich chain-ladder and bootstrap models</li>
+<li>General multivariate chain ladder-models</li>
+<li>Loss development factor fitting and Cape Cod models</li>
+<li>Generalized linear models</li>
+<li>One year claims development result functions</li>
+<li>Utility functions to:</li>
+</ol>
+<ul>
+<li>convert tables into triangles and triangles into tables</li>
+<li>convert cumulative into incremental and incremental into cumulative triangles</li>
+<li>visualise triangles.</li>
+</ul>
+<p>You’ll now load the triangle introduced above with the <code>ChainLadder</code> package. Here is how this works.</p>
+<pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;C:/Users/u0043788/Dropbox/Risk modelling course Ljubljana/Bookdown/data&quot;</span>)
+path.triangle &lt;-<span class="st"> </span><span class="kw">file.path</span>(path, <span class="st">&quot;TaylorAshe.txt&quot;</span>)
+my_triangle_data_set &lt;-<span class="st"> </span><span class="kw">read.table</span>(path.triangle, <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)</code></pre>
+<p>Using the <code>as.triangle</code> function from the <code>ChainLadder</code> package you can reshape the data frame into a ‘triangle’.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co">#install.packages(&quot;ChainLadder&quot;)</span>
+<span class="kw">library</span>(ChainLadder)
+<span class="co"># prepare triangle</span>
+my_triangle &lt;-<span class="st"> </span><span class="kw">as.triangle</span>(my_triangle_data_set, <span class="dt">origin =</span> <span class="st">&quot;NumAY&quot;</span>, <span class="dt">dev =</span> <span class="st">&quot;NumDY&quot;</span>, <span class="dt">value =</span> <span class="st">&quot;Paym&quot;</span>)
+my_triangle</code></pre>
+<pre><code>     NumDY
+NumAY      1       2       3       4      5      6      7      8      9    10
+   1  357848  766940  610542  482940 527326 574398 146342 139950 227229 67948
+   2  352118  884021  933894 1183289 445745 320996 527804 266172 425046    NA
+   3  290507 1001799  926219 1016654 750816 146923 495992 280405     NA    NA
+   4  310608 1108250  776189 1562400 272482 352053 206286     NA     NA    NA
+   5  443160  693190  991983  769488 504851 470639     NA     NA     NA    NA
+   6  396132  937085  847498  805037 705960     NA     NA     NA     NA    NA
+   7  440832  847631 1131398 1063269     NA     NA     NA     NA     NA    NA
+   8  359480 1061648 1443370      NA     NA     NA     NA     NA     NA    NA
+   9  376686  986608      NA      NA     NA     NA     NA     NA     NA    NA
+   10 344014      NA      NA      NA     NA     NA     NA     NA     NA    NA</code></pre>
+<p><strong>Exercise</strong>:</p>
+<ul>
+<li>interpret the arguments of the function <code>as.triangle</code></li>
+<li>what is the structure of the R object <code>my_triangle</code>?</li>
+</ul>
+<p>Here is an illustration of some useful functions from the package. Can you figure out what they do?</p>
+<pre class="sourceCode r"><code class="sourceCode r">my_triangle_cum &lt;-<span class="st"> </span><span class="kw">incr2cum</span>(my_triangle)
+my_triangle_cum</code></pre>
+<pre><code>     NumDY
+NumAY      1       2       3       4       5       6       7       8       9
+   1  357848 1124788 1735330 2218270 2745596 3319994 3466336 3606286 3833515
+   2  352118 1236139 2170033 3353322 3799067 4120063 4647867 4914039 5339085
+   3  290507 1292306 2218525 3235179 3985995 4132918 4628910 4909315      NA
+   4  310608 1418858 2195047 3757447 4029929 4381982 4588268      NA      NA
+   5  443160 1136350 2128333 2897821 3402672 3873311      NA      NA      NA
+   6  396132 1333217 2180715 2985752 3691712      NA      NA      NA      NA
+   7  440832 1288463 2419861 3483130      NA      NA      NA      NA      NA
+   8  359480 1421128 2864498      NA      NA      NA      NA      NA      NA
+   9  376686 1363294      NA      NA      NA      NA      NA      NA      NA
+   10 344014      NA      NA      NA      NA      NA      NA      NA      NA
+     NumDY
+NumAY      10
+   1  3901463
+   2       NA
+   3       NA
+   4       NA
+   5       NA
+   6       NA
+   7       NA
+   8       NA
+   9       NA
+   10      NA</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(my_triangle)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-97-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(my_triangle_cum)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-97-2.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(my_triangle, <span class="dt">lattice =</span> <span class="ot">TRUE</span>)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-97-3.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(my_triangle_cum, <span class="dt">lattice =</span> <span class="ot">TRUE</span>)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-97-4.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getLatestCumulative</span>(my_triangle_cum)</code></pre>
+<pre><code>      1       2       3       4       5       6       7       8       9      10 
+3901463 5339085 4909315 4588268 3873311 3691712 3483130 2864498 1363294  344014 
+attr(,&quot;latestcol&quot;)
+ 1  2  3  4  5  6  7  8  9 10 
+10  9  8  7  6  5  4  3  2  1 
+attr(,&quot;rowsname&quot;)
+[1] &quot;NumAY&quot;
+attr(,&quot;colnames&quot;)
+ [1] &quot;10&quot; &quot;9&quot;  &quot;8&quot;  &quot;7&quot;  &quot;6&quot;  &quot;5&quot;  &quot;4&quot;  &quot;3&quot;  &quot;2&quot;  &quot;1&quot; 
+attr(,&quot;colsname&quot;)
+[1] &quot;NumDY&quot;</code></pre>
+</div>
+</div>
+<div id="macks-chain-ladder-calculations" class="section level2">
+<h2><span class="header-section-number">6.3</span> Mack’s Chain-Ladder calculations</h2>
+<p>The <code>ChainLadder</code> package can easily perform Mack’s calculations (see the lecture notes by Katrien for more details).</p>
+<pre class="sourceCode r"><code class="sourceCode r">M &lt;-<span class="st"> </span><span class="kw">MackChainLadder</span>(my_triangle_cum, <span class="dt">est.sigma =</span> <span class="st">&quot;Mack&quot;</span>)
+M</code></pre>
+<pre><code>MackChainLadder(Triangle = my_triangle_cum, est.sigma = &quot;Mack&quot;)
+
+      Latest Dev.To.Date  Ultimate      IBNR  Mack.S.E CV(IBNR)
+1  3,901,463      1.0000 3,901,463         0         0      NaN
+2  5,339,085      0.9826 5,433,719    94,634    75,535    0.798
+3  4,909,315      0.9127 5,378,826   469,511   121,699    0.259
+4  4,588,268      0.8661 5,297,906   709,638   133,549    0.188
+5  3,873,311      0.7973 4,858,200   984,889   261,406    0.265
+6  3,691,712      0.7223 5,111,171 1,419,459   411,010    0.290
+7  3,483,130      0.6153 5,660,771 2,177,641   558,317    0.256
+8  2,864,498      0.4222 6,784,799 3,920,301   875,328    0.223
+9  1,363,294      0.2416 5,642,266 4,278,972   971,258    0.227
+10   344,014      0.0692 4,969,825 4,625,811 1,363,155    0.295
+
+                 Totals
+Latest:   34,358,090.00
+Dev:               0.65
+Ultimate: 53,038,945.61
+IBNR:     18,680,855.61
+Mack.S.E   2,447,094.86
+CV(IBNR):          0.13</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get development factors</span>
+M<span class="op">$</span>f</code></pre>
+<pre><code> [1] 3.491 1.747 1.457 1.174 1.104 1.086 1.054 1.077 1.018 1.000</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get the estimates for \sigma^2</span>
+M<span class="op">$</span>sigma<span class="op">^</span><span class="dv">2</span></code></pre>
+<pre><code>[1] 160280.3  37736.9  41965.2  15182.9  13731.3   8185.8    446.6   1147.4
+[9]    446.6</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get the full triangle</span>
+M<span class="op">$</span>FullTriangle</code></pre>
+<pre><code>      dev
+origin      1       2       3       4       5       6       7       8       9
+    1  357848 1124788 1735330 2218270 2745596 3319994 3466336 3606286 3833515
+    2  352118 1236139 2170033 3353322 3799067 4120063 4647867 4914039 5339085
+    3  290507 1292306 2218525 3235179 3985995 4132918 4628910 4909315 5285148
+    4  310608 1418858 2195047 3757447 4029929 4381982 4588268 4835458 5205637
+    5  443160 1136350 2128333 2897821 3402672 3873311 4207459 4434133 4773589
+    6  396132 1333217 2180715 2985752 3691712 4074999 4426546 4665023 5022155
+    7  440832 1288463 2419861 3483130 4088678 4513179 4902528 5166649 5562182
+    8  359480 1421128 2864498 4174756 4900545 5409337 5875997 6192562 6666635
+    9  376686 1363294 2382128 3471744 4075313 4498426 4886502 5149760 5544000
+    10 344014 1200818 2098228 3057984 3589620 3962307 4304132 4536015 4883270
+      dev
+origin      10
+    1  3901463
+    2  5433719
+    3  5378826
+    4  5297906
+    5  4858200
+    6  5111171
+    7  5660771
+    8  6784799
+    9  5642266
+    10 4969825</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get Mack SE</span>
+M<span class="op">$</span>Mack.S.E</code></pre>
+<pre><code>      dev
+origin 1      2      3      4      5       6       7       8       9      10
+    1  0      0      0      0      0       0       0       0       0       0
+    2  0      0      0      0      0       0       0       0       0   75535
+    3  0      0      0      0      0       0       0       0   94225  121699
+    4  0      0      0      0      0       0       0   52792  109210  133549
+    5  0      0      0      0      0       0  198502  215088  247694  261406
+    6  0      0      0      0      0  247204  337617  359530  397610  411010
+    7  0      0      0      0 250737  381475  468091  496372  543209  558317
+    8  0      0      0 378275 524309  648532  745376  787969  855493  875328
+    9  0      0 241429 489488 626722  739750  832421  878987  951274  971258
+    10 0 246656 486186 776148 940318 1066053 1175373 1239733 1337626 1363155</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># split parameter and process risk</span>
+M<span class="op">$</span>Mack.ProcessRisk</code></pre>
+<pre><code>      dev
+origin 1      2      3      4      5       6       7       8       9      10
+    1  0      0      0      0      0       0       0       0       0       0
+    2  0      0      0      0      0       0       0       0       0   48832
+    3  0      0      0      0      0       0       0       0   75052   90524
+    4  0      0      0      0      0       0       0   45268   89011  102622
+    5  0      0      0      0      0       0  178062  192597  219267  227880
+    6  0      0      0      0      0  225149  305242  324745  357179  366582
+    7  0      0      0      0 229965  347244  423348  448603  489045  500202
+    8  0      0      0 346712 478565  588507  673019  711125  770192  785741
+    9  0      0 226818 457429 583978  686644  770169  813005  878614  895570
+    10 0 234816 462237 736128 890565 1007785 1109441 1170034 1261670 1284882</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">M<span class="op">$</span>Mack.ParameterRisk</code></pre>
+<pre><code>      dev
+origin 1     2      3      4      5      6      7      8      9     10
+    1  0     0      0      0      0      0      0      0      0      0
+    2  0     0      0      0      0      0      0      0      0  57628
+    3  0     0      0      0      0      0      0      0  56970  81338
+    4  0     0      0      0      0      0      0  27163  63275  85464
+    5  0     0      0      0      0      0  87733  95756 115215 128078
+    6  0     0      0      0      0 102068 144266 154280 174690 185867
+    7  0     0      0      0  99925 157940 199712 212463 236456 248023
+    8  0     0      0 151271 214185 272494 320359 339405 372388 385759
+    9  0     0  82715 174234 227486 275226 315855 334127 364636 375893
+    10 0 75503 150710 246013 301814 347618 388126 409829 444333 455270</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(M<span class="op">$</span>Mack.ProcessRisk<span class="op">^</span><span class="dv">2</span><span class="op">+</span>M<span class="op">$</span>Mack.ParameterRisk<span class="op">^</span><span class="dv">2</span>)</code></pre>
+<pre><code>      dev
+origin 1      2      3      4      5       6       7       8       9      10
+    1  0      0      0      0      0       0       0       0       0       0
+    2  0      0      0      0      0       0       0       0       0   75535
+    3  0      0      0      0      0       0       0       0   94225  121699
+    4  0      0      0      0      0       0       0   52792  109210  133549
+    5  0      0      0      0      0       0  198502  215088  247694  261406
+    6  0      0      0      0      0  247204  337617  359530  397610  411010
+    7  0      0      0      0 250737  381475  468091  496372  543209  558317
+    8  0      0      0 378275 524309  648532  745376  787969  855493  875328
+    9  0      0 241429 489488 626722  739750  832421  878987  951274  971258
+    10 0 246656 486186 776148 940318 1066053 1175373 1239733 1337626 1363155</code></pre>
+<p>Again, the package can nicely visualize the results.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(M)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-99-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(M,<span class="dt">lattice=</span><span class="ot">TRUE</span>)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-99-2.png" width="576" style="display: block; margin: auto;" /></p>
+<p><strong>Exercise</strong>:</p>
+<ul>
+<li>interpret the plots. What do you see?</li>
+</ul>
+</div>
+<div id="glm-analysis-of-a-run-off-triangle" class="section level2">
+<h2><span class="header-section-number">6.4</span> GLM analysis of a run-off triangle</h2>
+<p>Next to Mack’s chain ladder calculation, you can also work with the data frame <code>my_triangle_data</code> and build a (overdispersed) Poisson GLM for these data.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(my_triangle_data)</code></pre>
+<pre><code>&#39;data.frame&#39;:   55 obs. of  4 variables:
+ $ Xij: num  357848 766940 610542 482940 527326 ...
+ $ i  : Factor w/ 10 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ j  : Factor w/ 10 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 1 2 3 4 5 6 7 8 9 10 ...
+ $ c  : Factor w/ 10 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 1 2 3 4 5 6 7 8 9 10 ...</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Poisson GLM of Xij versus i+j</span>
+poi_glm &lt;-<span class="st"> </span><span class="kw">glm</span>(Xij <span class="op">~</span><span class="st"> </span>i <span class="op">+</span><span class="st"> </span>j, <span class="kw">poisson</span>(<span class="dt">link=</span>log), <span class="dt">data =</span> my_triangle_data)
+<span class="kw">summary</span>(poi_glm)</code></pre>
+<pre><code>
+Call:
+glm(formula = Xij ~ i + j, family = poisson(link = log), data = my_triangle_data)
+
+Deviance Residuals: 
+   Min      1Q  Median      3Q     Max  
+-464.9  -123.7   -21.7   116.2   494.3  
+
+Coefficients:
+             Estimate Std. Error  z value Pr(&gt;|z|)    
+(Intercept) 12.506405   0.000754 16587.37  &lt; 2e-16 ***
+i2           0.331272   0.000669   494.85  &lt; 2e-16 ***
+i3           0.321119   0.000688   466.96  &lt; 2e-16 ***
+i4           0.305960   0.000701   436.57  &lt; 2e-16 ***
+i5           0.219316   0.000732   299.46  &lt; 2e-16 ***
+i6           0.270077   0.000745   362.76  &lt; 2e-16 ***
+i7           0.372208   0.000761   489.34  &lt; 2e-16 ***
+i8           0.553333   0.000813   680.38  &lt; 2e-16 ***
+i9           0.368934   0.001043   353.77  &lt; 2e-16 ***
+i10          0.242033   0.001864   129.83  &lt; 2e-16 ***
+j2           0.912526   0.000649  1406.04  &lt; 2e-16 ***
+j3           0.958831   0.000665  1441.37  &lt; 2e-16 ***
+j4           1.025997   0.000684  1499.93  &lt; 2e-16 ***
+j5           0.435276   0.000802   542.81  &lt; 2e-16 ***
+j6           0.080057   0.000936    85.49  &lt; 2e-16 ***
+j7          -0.006381   0.001039    -6.14  8.1e-10 ***
+j8          -0.394452   0.001353  -291.56  &lt; 2e-16 ***
+j9           0.009378   0.001396     6.72  1.9e-11 ***
+j10         -1.379907   0.003910  -352.95  &lt; 2e-16 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 10699464  on 54  degrees of freedom
+Residual deviance:  1903014  on 36  degrees of freedom
+AIC: 1903877
+
+Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get coefficients of this regression model</span>
+<span class="kw">coef</span>(poi_glm)</code></pre>
+<pre><code>(Intercept)          i2          i3          i4          i5          i6 
+  12.506405    0.331272    0.321119    0.305960    0.219316    0.270077 
+         i7          i8          i9         i10          j2          j3 
+   0.372208    0.553333    0.368934    0.242033    0.912526    0.958831 
+         j4          j5          j6          j7          j8          j9 
+   1.025997    0.435276    0.080057   -0.006381   -0.394452    0.009378 
+        j10 
+  -1.379907 </code></pre>
+<p><strong>Exercise</strong>:</p>
+<ul>
+<li>write down the full model specification of this GLM.</li>
+</ul>
+<p>Using the coefficients stored in <code>poi_glm</code> you want to extract fitted values for upper and lower triangle.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># apply inverse link function</span>
+coefs &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">as.numeric</span>(<span class="kw">coef</span>(poi_glm)))
+alpha &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, coefs[<span class="dv">2</span><span class="op">:</span>TT])<span class="op">*</span>coefs[<span class="dv">1</span>]
+alpha</code></pre>
+<pre><code> [1] 270061 376125 372325 366724 336287 353798 391842 469648 390561 344014</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(alpha)</code></pre>
+<pre><code>[1] 10</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">beta  &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, coefs[(TT<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>TT<span class="dv">-1</span>)])
+beta</code></pre>
+<pre><code> [1] 1.0000 2.4906 2.6086 2.7899 1.5454 1.0833 0.9936 0.6740 1.0094 0.2516</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(beta)</code></pre>
+<pre><code>[1] 10</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fitted values, original scale</span>
+orig_fits &lt;-<span class="st"> </span>alpha <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(beta)
+<span class="kw">dim</span>(orig_fits)</code></pre>
+<pre><code>[1] 10 10</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(orig_fits)</code></pre>
+<pre><code> num [1:10, 1:10] 270061 376125 372325 366724 336287 ...</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">orig_fits</code></pre>
+<pre><code>        [,1]    [,2]    [,3]    [,4]   [,5]   [,6]   [,7]   [,8]   [,9]  [,10]
+ [1,] 270061  672617  704494  753438 417350 292571 268344 182035 272606  67948
+ [2,] 376125  936779  981176 1049342 581260 407474 373732 253527 379669  94634
+ [3,] 372325  927316  971264 1038741 575388 403358 369957 250966 375833  93678
+ [4,] 366724  913365  956652 1023114 566731 397290 364391 247190 370179  92268
+ [5,] 336287  837559  877254  938200 519695 364316 334148 226674 339456  84611
+ [6,] 353798  881172  922933  987053 546756 383287 351548 238477 357132  89016
+ [7,] 391842  975923 1022175 1093189 605548 424501 389349 264121 395534  98588
+ [8,] 469648 1169707 1225143 1310258 725788 508792 466660 316566 474073 118164
+ [9,] 390561  972733 1018834 1089616 603569 423113 388076 263257 394241  98266
+[10,] 344014  856804  897410  959756 531636 372687 341826 231882 347255  86555</code></pre>
+<p>Of course, you can also extract <code>fitted.values</code> from the GLM stored in <code>poi_glm</code>. What is the difference with our own coded approach?</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">fitted.values</span>(poi_glm)</code></pre>
+<pre><code>      1       2       3       4       5       6       7       8       9      10 
+ 270061  672617  704494  753438  417350  292571  268344  182035  272606   67948 
+     11      12      13      14      15      16      17      18      19      20 
+ 376125  936779  981176 1049342  581260  407474  373732  253527  379669  372325 
+     21      22      23      24      25      26      27      28      29      30 
+ 927316  971264 1038741  575388  403358  369957  250966  366724  913365  956652 
+     31      32      33      34      35      36      37      38      39      40 
+1023114  566731  397290  364391  336287  837559  877254  938200  519695  364316 
+     41      42      43      44      45      46      47      48      49      50 
+ 353798  881172  922933  987053  546756  391842  975923 1022175 1093189  469648 
+     51      52      53      54      55 
+1169707 1225143  390561  972733  344014 </code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># extract future</span>
+future &lt;-<span class="st"> </span><span class="kw">row</span>(orig_fits) <span class="op">+</span><span class="st"> </span><span class="kw">col</span>(orig_fits) <span class="op">-</span><span class="st"> </span><span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span>TT
+future</code></pre>
+<pre><code>       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10]
+ [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [2,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE
+ [3,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE
+ [4,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE
+ [5,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE
+ [6,] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE
+ [7,] FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+ [8,] FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+ [9,] FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[10,] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE</code></pre>
+<p>To conclude, you calculate the point estimates of the reserves (in total and per row) as obtained from the <code>poi_glm</code> fit.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># compare reserves with CL reserves</span>
+orig_reserve_tot &lt;-<span class="st"> </span><span class="kw">sum</span>(orig_fits[future])
+orig_reserve_row &lt;-<span class="st"> </span><span class="kw">numeric</span>(TT<span class="dv">-1</span>)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span>TT){
+  orig_reserve_row[i<span class="dv">-1</span>] &lt;-<span class="st"> </span><span class="kw">sum</span>(orig_fits[i, (TT<span class="op">-</span>i<span class="op">+</span><span class="dv">2</span>)<span class="op">:</span>TT])
+}
+point_est_glm &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dv">2</span><span class="op">:</span>TT, orig_reserve_row)
+<span class="kw">names</span>(point_est_glm) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;row&quot;</span>, <span class="st">&quot;reserve&quot;</span>)
+orig_reserve_tot</code></pre>
+<pre><code>[1] 18680856</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">point_est_glm</code></pre>
+<pre><code>  row reserve
+1   2   94634
+2   3  469511
+3   4  709638
+4   5  984889
+5   6 1419459
+6   7 2177641
+7   8 3920301
+8   9 4278972
+9  10 4625811</code></pre>
+<p><strong>Exercise</strong>:</p>
+<ul>
+<li>compare the point estimates with the results stored in object <code>M</code>. What do you conclude?</li>
+<li>now redo the analysis, use <code>family = quasipoisson</code> to do overdispersed Poisson instead of regular Poisson regression.</li>
+</ul>
+</div>
+<div id="bootstrap-analysis" class="section level2">
+<h2><span class="header-section-number">6.5</span> Bootstrap analysis</h2>
+<p>Starting from the results of an overdispersed Poisson GLM you can now code a bootstrap analysis to simulate from the predictive distribution of the outstanding reserve. Here is the preparatory work.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># OD Poisson GLM of Xij versus i+j</span>
+poi_glm_od &lt;-<span class="st"> </span><span class="kw">glm</span>(Xij <span class="op">~</span><span class="st"> </span>i <span class="op">+</span><span class="st"> </span>j, <span class="kw">quasipoisson</span>(<span class="dt">link=</span>log), <span class="dt">data =</span> my_triangle_data)
+<span class="kw">summary</span>(poi_glm_od)</code></pre>
+<pre><code>
+Call:
+glm(formula = Xij ~ i + j, family = quasipoisson(link = log), 
+    data = my_triangle_data)
+
+Deviance Residuals: 
+   Min      1Q  Median      3Q     Max  
+-464.9  -123.7   -21.7   116.2   494.3  
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 12.50640    0.17292   72.32  &lt; 2e-16 ***
+i2           0.33127    0.15354    2.16   0.0377 *  
+i3           0.32112    0.15772    2.04   0.0492 *  
+i4           0.30596    0.16074    1.90   0.0650 .  
+i5           0.21932    0.16797    1.31   0.1999    
+i6           0.27008    0.17076    1.58   0.1225    
+i7           0.37221    0.17445    2.13   0.0398 *  
+i8           0.55333    0.18653    2.97   0.0053 ** 
+i9           0.36893    0.23918    1.54   0.1317    
+i10          0.24203    0.42756    0.57   0.5749    
+j2           0.91253    0.14885    6.13  4.7e-07 ***
+j3           0.95883    0.15257    6.28  2.9e-07 ***
+j4           1.02600    0.15688    6.54  1.3e-07 ***
+j5           0.43528    0.18391    2.37   0.0234 *  
+j6           0.08006    0.21477    0.37   0.7115    
+j7          -0.00638    0.23829   -0.03   0.9788    
+j8          -0.39445    0.31029   -1.27   0.2118    
+j9           0.00938    0.32025    0.03   0.9768    
+j10         -1.37991    0.89669   -1.54   0.1326    
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+(Dispersion parameter for quasipoisson family taken to be 52602)
+
+    Null deviance: 10699464  on 54  degrees of freedom
+Residual deviance:  1903014  on 36  degrees of freedom
+AIC: NA
+
+Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># extract Pearson residuals</span>
+Prs.resid &lt;-<span class="st"> </span>(my_triangle_data<span class="op">$</span>Xij <span class="op">-</span><span class="st"> </span><span class="kw">fitted</span>(poi_glm_od))<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">fitted</span>(poi_glm_od))
+<span class="co"># get estimate dispersion parameter</span>
+n</code></pre>
+<pre><code>[1] 55</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">p &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>TT<span class="dv">-1</span>
+p</code></pre>
+<pre><code>[1] 19</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">phi.P &lt;-<span class="st"> </span><span class="kw">sum</span>(Prs.resid<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span>(n<span class="op">-</span>p)
+phi.P</code></pre>
+<pre><code>[1] 52601</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># adjust the residuals for bias in the same way as scale parameter</span>
+Adj.Prs.resid &lt;-<span class="st"> </span>Prs.resid<span class="op">*</span><span class="kw">sqrt</span>(n<span class="op">/</span>(n<span class="op">-</span>p))</code></pre>
+<p>And here starts the bootstrap loop, see Katrien’s lecture notes for explanation and schematic overview.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># initialize the random number generator</span>
+<span class="kw">set.seed</span>(<span class="dv">6345789</span>)
+
+<span class="co"># i and j as factor variables</span>
+i &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>TT, TT<span class="op">:</span><span class="dv">1</span>); i &lt;-<span class="st"> </span><span class="kw">as.factor</span>(i)
+j &lt;-<span class="st"> </span><span class="kw">sequence</span>(TT<span class="op">:</span><span class="dv">1</span>); j &lt;-<span class="st"> </span><span class="kw">as.factor</span>(j)
+
+<span class="co"># run the bootstrap loop many times, eg 10000 times</span>
+nBoot &lt;-<span class="st"> </span><span class="dv">10000</span>
+payments &lt;-<span class="st"> </span><span class="kw">numeric</span>(nBoot)
+
+<span class="cf">for</span>(boots <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nBoot){  ## start of the bootstrap loop
+    <span class="co"># Step 1: resample from the adjusted residuals, with replacement</span>
+    Ps.Xij &lt;-<span class="st"> </span><span class="kw">sample</span>(Adj.Prs.resid, n, <span class="dt">replace=</span><span class="ot">TRUE</span>)
+    <span class="co"># Step 2: using this set of residuals and the estimated values of \hat{\mu_{ij}}</span>
+    <span class="co"># create a new suitable pseudo-history</span>
+    Ps.Xij &lt;-<span class="st"> </span>Ps.Xij<span class="op">*</span><span class="kw">sqrt</span>(<span class="kw">fitted</span>(poi_glm_od))<span class="op">+</span><span class="kw">fitted</span>(poi_glm_od)
+    Ps.Xij &lt;-<span class="st"> </span><span class="kw">pmax</span>(Ps.Xij, <span class="dv">0</span>) 
+    <span class="co"># Step 3: from this history, estimate \alpha_i, beta_j</span>
+    Ps.CL &lt;-<span class="st"> </span><span class="kw">glm</span>(Ps.Xij <span class="op">~</span><span class="st"> </span>i <span class="op">+</span><span class="st"> </span>j, quasipoisson)
+    coefs &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">as.numeric</span>(<span class="kw">coef</span>(Ps.CL)))
+    Ps.alpha &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, coefs[<span class="dv">2</span><span class="op">:</span>TT])<span class="op">*</span>coefs[<span class="dv">1</span>]
+    Ps.beta &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, coefs[(TT<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>TT<span class="dv">-1</span>)])
+    <span class="co"># Step 4: compute fitted values, use sum of future part as an estimate of the reserve</span>
+    Ps.fits &lt;-<span class="st"> </span>Ps.alpha<span class="op">%*%</span><span class="kw">t</span>(Ps.beta)
+    Ps.reserve &lt;-<span class="st"> </span><span class="kw">sum</span>(Ps.fits[future])
+    <span class="co"># Step 5: </span>
+    Ps.totpayments &lt;-<span class="st"> </span>phi.P<span class="op">*</span><span class="kw">rpois</span>(<span class="dv">1</span>, Ps.reserve<span class="op">/</span>phi.P)
+    <span class="co"># Step 6:</span>
+    payments[boots] &lt;-<span class="st"> </span>Ps.totpayments
+}
+<span class="kw">min</span>(payments)</code></pre>
+<pre><code>[1] 7416792</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">max</span>(payments)</code></pre>
+<pre><code>[1] 31981628</code></pre>
+<p>You extract useful summaries from the results stored in <code>payments</code> as follows.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">quantile</span>(payments, <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.99</span>), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre>
+<pre><code>     50%      75%      90%      95%      99% 
+18673483 20672335 22671187 23986221 26826694 </code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(payments)</code></pre>
+<pre><code>[1] 18848278</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(payments)</code></pre>
+<pre><code>[1] 2968997</code></pre>
+<p>And plots</p>
+<pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">data.frame</span>(payments)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">ggplot</span>(<span class="dt">data=</span>d, <span class="kw">aes</span>(payments)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">col =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Histogram for Bootstrap Reserves&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Reserves&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Count&quot;</span>) </code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-107-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>The <code>ChainLadder</code> package also has useful functions to set up bootstrap simulations.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
+B &lt;-<span class="st"> </span><span class="kw">BootChainLadder</span>(GenIns, <span class="dt">R =</span> <span class="dv">10000</span>, <span class="dt">process.distr =</span> <span class="st">&quot;od.pois&quot;</span>)
+B</code></pre>
+<pre><code>BootChainLadder(Triangle = GenIns, R = 10000, process.distr = &quot;od.pois&quot;)
+
+      Latest Mean Ultimate Mean IBNR  IBNR.S.E  IBNR 75%  IBNR 95%
+1  3,901,463     3,901,463         0         0         0         0
+2  5,339,085     5,435,471    96,386   113,603   149,138   312,621
+3  4,909,315     5,380,702   471,387   217,453   598,149   864,988
+4  4,588,268     5,305,145   716,877   261,068   876,808 1,179,647
+5  3,873,311     4,864,352   991,041   307,441 1,179,230 1,542,424
+6  3,691,712     5,126,756 1,435,044   380,790 1,673,438 2,107,963
+7  3,483,130     5,673,303 2,190,173   497,466 2,509,815 3,058,627
+8  2,864,498     6,815,226 3,950,728   796,044 4,445,624 5,355,080
+9  1,363,294     5,684,146 4,320,852 1,064,740 4,952,187 6,209,475
+10   344,014     5,043,687 4,699,673 2,018,504 5,899,153 8,156,800
+
+                    Totals
+Latest:         34,358,090
+Mean Ultimate:  53,230,252
+Mean IBNR:      18,872,162
+IBNR.S.E         3,001,662
+Total IBNR 75%: 20,761,090
+Total IBNR 95%: 24,064,106</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(B)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-108-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># some attributes o</span>
+B<span class="op">$</span>Triangle</code></pre>
+<pre><code>      dev
+origin      1       2       3       4       5       6       7       8       9
+    1  357848 1124788 1735330 2218270 2745596 3319994 3466336 3606286 3833515
+    2  352118 1236139 2170033 3353322 3799067 4120063 4647867 4914039 5339085
+    3  290507 1292306 2218525 3235179 3985995 4132918 4628910 4909315      NA
+    4  310608 1418858 2195047 3757447 4029929 4381982 4588268      NA      NA
+    5  443160 1136350 2128333 2897821 3402672 3873311      NA      NA      NA
+    6  396132 1333217 2180715 2985752 3691712      NA      NA      NA      NA
+    7  440832 1288463 2419861 3483130      NA      NA      NA      NA      NA
+    8  359480 1421128 2864498      NA      NA      NA      NA      NA      NA
+    9  376686 1363294      NA      NA      NA      NA      NA      NA      NA
+    10 344014      NA      NA      NA      NA      NA      NA      NA      NA
+      dev
+origin      10
+    1  3901463
+    2       NA
+    3       NA
+    4       NA
+    5       NA
+    6       NA
+    7       NA
+    8       NA
+    9       NA
+    10      NA</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">B<span class="op">$</span>f</code></pre>
+<pre><code> [1] 3.491 1.747 1.457 1.174 1.104 1.086 1.054 1.077 1.018 1.000</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">B<span class="op">$</span>IBNR.Totals[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]</code></pre>
+<pre><code> [1] 21398909 17870368 17597508 18428981 19512320 19606687 15880725 22244763
+ [9] 19325943 17354310</code></pre>
+</div>
+<div id="more-info" class="section level2">
+<h2><span class="header-section-number">6.6</span> More info</h2>
+<p>Recent papers on reserving by Katrien:</p>
+<ul>
+<li>“A time change strategy to model reporting delay dynamics in claims reserving”, avalailable <a href="https://arxiv.org/abs/1801.02935">here</a></li>
+<li>“An EM algorithm to model the occurrence of events subject to a reporting delay” available <a href="https://feb.kuleuven.be/public/u0043181/papers/KBI_1807.pdf">here</a>.</li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="glms.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

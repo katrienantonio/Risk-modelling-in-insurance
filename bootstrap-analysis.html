@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>10 Bootstrap analysis | Risk Modelling in Insurance : a collection of computer labs in R</title>
+  <meta name="description" content="Tutorials for the course of Loss Models">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="10 Bootstrap analysis | Risk Modelling in Insurance : a collection of computer labs in R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Tutorials for the course of Loss Models" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="10 Bootstrap analysis | Risk Modelling in Insurance : a collection of computer labs in R" />
+  
+  <meta name="twitter:description" content="Tutorials for the course of Loss Models" />
+  
+
+<meta name="author" content="Katrien Antonio and Jonas Crevecoeur">
+
+
+<meta name="date" content="2019-01-13">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="glm-analysis-of-a-run-off-triangle.html">
+<link rel="next" href="more-info.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+<script>
+$(document).ready(function() {
+
+  $chunks = $('.fold');
+
+  $chunks.each(function () {
+
+    // add button to source code chunks
+      $(this).prepend("<div class=\"showopt\">Show Solution</div><br style=\"line-height:22px;\"/>");
+ 
+	$child = $(this).children('div');
+	$child.each(function(){
+		$(this).children('').attr('class', 'folded');
+	});
+	$(this).children('pre').attr('class', 'folded');
+	$(this).children('p').attr('class', 'folded');
+   });
+
+  // hide all chunks when document is loaded
+  $('.folded').css('display', 'none')
+
+  // function to toggle the visibility
+  $('.showopt').click(function() {
+    var label = $(this).html();
+    if (label.indexOf("Show") >= 0) {
+      $(this).html(label.replace("Show", "Hide"));
+    } else {
+      $(this).html(label.replace("Hide", "Show"));
+    }
+    	$child = $(this).siblings('div');
+	$child.each(function(){
+		$(this).children('pre').slideToggle('fast', 'swing');
+	});
+	$(this).siblings('pre').slideToggle('fast', 'swing');
+	$(this).siblings('p').slideToggle('fast', 'swing');
+  });
+});
+</script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Intro</a></li>
+<li class="chapter" data-level="2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html"><i class="fa fa-check"></i><b>2</b> Simple, parametric distributions for frequency and severity data</a><ul>
+<li class="chapter" data-level="2.1" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#the-exponential-distribution"><i class="fa fa-check"></i><b>2.1</b> The exponential distribution</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#simulating-data"><i class="fa fa-check"></i><b>2.1.1</b> Simulating data</a></li>
+<li class="chapter" data-level="2.1.2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#exploratory-analysis"><i class="fa fa-check"></i><b>2.1.2</b> Exploratory analysis</a></li>
+<li class="chapter" data-level="2.1.3" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#data-visualization-with-ggplot"><i class="fa fa-check"></i><b>2.1.3</b> Data visualization with ggplot</a></li>
+<li class="chapter" data-level="2.1.4" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#maximum-likelihood-estimation-mle"><i class="fa fa-check"></i><b>2.1.4</b> Maximum Likelihood Estimation (MLE)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#discrete-distributions"><i class="fa fa-check"></i><b>2.2</b> Discrete distributions</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#simulating-the-data"><i class="fa fa-check"></i><b>2.2.1</b> Simulating the data</a></li>
+<li class="chapter" data-level="2.2.2" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#exploratory-analysis-1"><i class="fa fa-check"></i><b>2.2.2</b> Exploratory analysis</a></li>
+<li class="chapter" data-level="2.2.3" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#maximum-likelihood-estimation-mle-1"><i class="fa fa-check"></i><b>2.2.3</b> Maximum Likelihood Estimation (MLE)</a></li>
+<li class="chapter" data-level="2.2.4" data-path="simple-parametric-distributions-for-frequency-and-severity-data.html"><a href="simple-parametric-distributions-for-frequency-and-severity-data.html#comparing-fitted-models"><i class="fa fa-check"></i><b>2.2.4</b> Comparing fitted models</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html"><i class="fa fa-check"></i><b>3</b> Putting it all together: case study on modelling claim counts</a><ul>
+<li class="chapter" data-level="3.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#read-in-data"><i class="fa fa-check"></i><b>3.1</b> Read in data</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#determining-the-file-path"><i class="fa fa-check"></i><b>3.1.1</b> Determining the file path</a></li>
+<li class="chapter" data-level="3.1.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#importing-a-.txt-file"><i class="fa fa-check"></i><b>3.1.2</b> Importing a .txt file</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#exploratory-analysis-2"><i class="fa fa-check"></i><b>3.2</b> Exploratory analysis</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#summary-statistics-disregarding-exposure"><i class="fa fa-check"></i><b>3.2.1</b> Summary statistics disregarding exposure</a></li>
+<li class="chapter" data-level="3.2.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#summary-statistics-taking-into-account-exposure"><i class="fa fa-check"></i><b>3.2.2</b> Summary statistics taking into account exposure</a></li>
+<li class="chapter" data-level="3.2.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#empirical-probability-distribution"><i class="fa fa-check"></i><b>3.2.3</b> Empirical probability distribution</a></li>
+<li class="chapter" data-level="3.2.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#the-a-b-0-class-of-distributions"><i class="fa fa-check"></i><b>3.2.4</b> The (a, b, 0) class of distributions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#fitting-count-distributions"><i class="fa fa-check"></i><b>3.3</b> Fitting count distributions</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#poisson"><i class="fa fa-check"></i><b>3.3.1</b> Poisson</a></li>
+<li class="chapter" data-level="3.3.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#negative-binomial-1"><i class="fa fa-check"></i><b>3.3.2</b> Negative binomial</a></li>
+<li class="chapter" data-level="3.3.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#modified-poisson-distributions"><i class="fa fa-check"></i><b>3.3.3</b> Modified Poisson distributions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#aic-1"><i class="fa fa-check"></i><b>3.4</b> AIC</a></li>
+<li class="chapter" data-level="3.5" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#replicating-data-sets"><i class="fa fa-check"></i><b>3.5</b> Replicating data sets</a><ul>
+<li class="chapter" data-level="3.5.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#poisson-1"><i class="fa fa-check"></i><b>3.5.1</b> Poisson</a></li>
+<li class="chapter" data-level="3.5.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#nb"><i class="fa fa-check"></i><b>3.5.2</b> NB</a></li>
+<li class="chapter" data-level="3.5.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#zip"><i class="fa fa-check"></i><b>3.5.3</b> ZIP</a></li>
+<li class="chapter" data-level="3.5.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#hurdle-poisson-1"><i class="fa fa-check"></i><b>3.5.4</b> Hurdle Poisson</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#mean-and-variance-of-the-estimated-zip-nb-hurdle-poisson"><i class="fa fa-check"></i><b>3.6</b> Mean and variance of the estimated ZIP, NB, Hurdle Poisson</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#poisson-2"><i class="fa fa-check"></i><b>3.6.1</b> Poisson</a></li>
+<li class="chapter" data-level="3.6.2" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#nb-1"><i class="fa fa-check"></i><b>3.6.2</b> NB</a></li>
+<li class="chapter" data-level="3.6.3" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#zip-1"><i class="fa fa-check"></i><b>3.6.3</b> ZIP</a></li>
+<li class="chapter" data-level="3.6.4" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#hurdle-poisson-2"><i class="fa fa-check"></i><b>3.6.4</b> Hurdle Poisson</a></li>
+<li class="chapter" data-level="3.6.5" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#comparison-with-empirical-mean-and-variance"><i class="fa fa-check"></i><b>3.6.5</b> Comparison with empirical mean and variance</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="putting-it-all-together-case-study-on-modelling-claim-counts.html"><a href="putting-it-all-together-case-study-on-modelling-claim-counts.html#conclusion"><i class="fa fa-check"></i><b>3.7</b> Conclusion</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="simulation.html"><a href="simulation.html"><i class="fa fa-check"></i><b>4</b> Simulation</a><ul>
+<li class="chapter" data-level="4.1" data-path="simulation.html"><a href="simulation.html#severity"><i class="fa fa-check"></i><b>4.1</b> Severity</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="simulation.html"><a href="simulation.html#probability-integral-transform"><i class="fa fa-check"></i><b>4.1.1</b> Probability integral transform</a></li>
+<li class="chapter" data-level="4.1.2" data-path="simulation.html"><a href="simulation.html#visualization"><i class="fa fa-check"></i><b>4.1.2</b> Visualization</a></li>
+<li class="chapter" data-level="4.1.3" data-path="simulation.html"><a href="simulation.html#expected-loss-with-a-deductible"><i class="fa fa-check"></i><b>4.1.3</b> Expected loss with a deductible</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="simulation.html"><a href="simulation.html#aggregate-loss"><i class="fa fa-check"></i><b>4.2</b> Aggregate loss</a></li>
+<li class="chapter" data-level="4.3" data-path="simulation.html"><a href="simulation.html#simulating-future-life-times-of-newborns"><i class="fa fa-check"></i><b>4.3</b> Simulating future life times of newborns</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="simulation.html"><a href="simulation.html#importing-the-data"><i class="fa fa-check"></i><b>4.3.1</b> Importing the data</a></li>
+<li class="chapter" data-level="4.3.2" data-path="simulation.html"><a href="simulation.html#simulate-the-whole-life-time"><i class="fa fa-check"></i><b>4.3.2</b> Simulate the whole life time</a></li>
+<li class="chapter" data-level="4.3.3" data-path="simulation.html"><a href="simulation.html#simulate-the-future-lifetime"><i class="fa fa-check"></i><b>4.3.3</b> Simulate the future lifetime</a></li>
+<li class="chapter" data-level="4.3.4" data-path="simulation.html"><a href="simulation.html#visualize-the-data"><i class="fa fa-check"></i><b>4.3.4</b> Visualize the data</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="glms.html"><a href="glms.html"><i class="fa fa-check"></i><b>5</b> Generalized Linear Models in R</a><ul>
+<li class="chapter" data-level="5.1" data-path="glms.html"><a href="glms.html#modelling-count-data-with-poisson-regression-models"><i class="fa fa-check"></i><b>5.1</b> Modelling count data with Poisson regression models</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="glms.html"><a href="glms.html#a-first-data-set"><i class="fa fa-check"></i><b>5.1.1</b> A first data set</a></li>
+<li class="chapter" data-level="5.1.2" data-path="glms.html"><a href="glms.html#fit-a-poisson-glm"><i class="fa fa-check"></i><b>5.1.2</b> Fit a Poisson GLM</a></li>
+<li class="chapter" data-level="5.1.3" data-path="glms.html"><a href="glms.html#the-use-of-exposure"><i class="fa fa-check"></i><b>5.1.3</b> The use of exposure</a></li>
+<li class="chapter" data-level="5.1.4" data-path="glms.html"><a href="glms.html#analysis-of-deviance-for-glms"><i class="fa fa-check"></i><b>5.1.4</b> Analysis of deviance for GLMs</a></li>
+<li class="chapter" data-level="5.1.5" data-path="glms.html"><a href="glms.html#an-example"><i class="fa fa-check"></i><b>5.1.5</b> An example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="glms.html"><a href="glms.html#overdispersed-poisson-regression"><i class="fa fa-check"></i><b>5.2</b> Overdispersed Poisson regression</a></li>
+<li class="chapter" data-level="5.3" data-path="glms.html"><a href="glms.html#negative-binomial-regression"><i class="fa fa-check"></i><b>5.3</b> Negative Binomial regression</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="claims-reserving-with-chainladder-and-glms.html"><a href="claims-reserving-with-chainladder-and-glms.html"><i class="fa fa-check"></i><b>6</b> Claims reserving with ChainLadder and GLMs</a><ul>
+<li class="chapter" data-level="6.1" data-path="claims-reserving-with-chainladder-and-glms.html"><a href="claims-reserving-with-chainladder-and-glms.html#goals"><i class="fa fa-check"></i><b>6.1</b> Goals</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="import-a-run-off-triangle.html"><a href="import-a-run-off-triangle.html"><i class="fa fa-check"></i><b>7</b> Import a run-off triangle</a><ul>
+<li class="chapter" data-level="7.1" data-path="import-a-run-off-triangle.html"><a href="import-a-run-off-triangle.html#using-scan"><i class="fa fa-check"></i><b>7.1</b> Using <code>scan</code></a></li>
+<li class="chapter" data-level="7.2" data-path="import-a-run-off-triangle.html"><a href="import-a-run-off-triangle.html#using-the-chainladder-package"><i class="fa fa-check"></i><b>7.2</b> Using the <code>chainladder</code> package</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="macks-chain-ladder-calculations.html"><a href="macks-chain-ladder-calculations.html"><i class="fa fa-check"></i><b>8</b> Mack’s Chain-Ladder calculations</a></li>
+<li class="chapter" data-level="9" data-path="glm-analysis-of-a-run-off-triangle.html"><a href="glm-analysis-of-a-run-off-triangle.html"><i class="fa fa-check"></i><b>9</b> GLM analysis of a run-off triangle</a></li>
+<li class="chapter" data-level="10" data-path="bootstrap-analysis.html"><a href="bootstrap-analysis.html"><i class="fa fa-check"></i><b>10</b> Bootstrap analysis</a></li>
+<li class="chapter" data-level="11" data-path="more-info.html"><a href="more-info.html"><i class="fa fa-check"></i><b>11</b> More info</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Risk Modelling in Insurance : a collection of computer labs in R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="bootstrap-analysis" class="section level1">
+<h1><span class="header-section-number">10</span> Bootstrap analysis</h1>
+<p>Starting from the results of an overdispersed Poisson GLM you can now code a bootstrap analysis to simulate from the predictive distribution of the outstanding reserve. Here is the preparatory work.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># OD Poisson GLM of Xij versus i+j</span>
+poi_glm_od &lt;-<span class="st"> </span><span class="kw">glm</span>(Xij <span class="op">~</span><span class="st"> </span>i <span class="op">+</span><span class="st"> </span>j, <span class="kw">quasipoisson</span>(<span class="dt">link=</span>log), <span class="dt">data =</span> my_triangle_data)
+<span class="kw">summary</span>(poi_glm_od)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Xij ~ i + j, family = quasipoisson(link = log), 
+##     data = my_triangle_data)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -464.88  -123.73   -21.75   116.21   494.35  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 12.506405   0.172924  72.323  &lt; 2e-16 ***
+## i2           0.331272   0.153537   2.158  0.03771 *  
+## i3           0.321119   0.157719   2.036  0.04916 *  
+## i4           0.305960   0.160736   1.903  0.06499 .  
+## i5           0.219316   0.167970   1.306  0.19994    
+## i6           0.270077   0.170756   1.582  0.12247    
+## i7           0.372208   0.174451   2.134  0.03976 *  
+## i8           0.553333   0.186525   2.967  0.00532 ** 
+## i9           0.368934   0.239181   1.542  0.13170    
+## i10          0.242033   0.427562   0.566  0.57485    
+## j2           0.912526   0.148850   6.131 4.65e-07 ***
+## j3           0.958831   0.152569   6.285 2.90e-07 ***
+## j4           1.025997   0.156883   6.540 1.33e-07 ***
+## j5           0.435276   0.183914   2.367  0.02344 *  
+## j6           0.080057   0.214770   0.373  0.71152    
+## j7          -0.006381   0.238290  -0.027  0.97878    
+## j8          -0.394452   0.310289  -1.271  0.21180    
+## j9           0.009378   0.320249   0.029  0.97680    
+## j10         -1.379907   0.896690  -1.539  0.13258    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for quasipoisson family taken to be 52601.93)
+## 
+##     Null deviance: 10699464  on 54  degrees of freedom
+## Residual deviance:  1903014  on 36  degrees of freedom
+## AIC: NA
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># extract Pearson residuals</span>
+Prs.resid &lt;-<span class="st"> </span>(my_triangle_data<span class="op">$</span>Xij <span class="op">-</span><span class="st"> </span><span class="kw">fitted</span>(poi_glm_od))<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">fitted</span>(poi_glm_od))
+<span class="co"># get estimate dispersion parameter</span>
+n</code></pre>
+<pre><code>## [1] 55</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">p &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>TT<span class="dv">-1</span>
+p</code></pre>
+<pre><code>## [1] 19</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">phi.P &lt;-<span class="st"> </span><span class="kw">sum</span>(Prs.resid<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span>(n<span class="op">-</span>p)
+phi.P</code></pre>
+<pre><code>## [1] 52601.36</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># adjust the residuals for bias in the same way as scale parameter</span>
+Adj.Prs.resid &lt;-<span class="st"> </span>Prs.resid<span class="op">*</span><span class="kw">sqrt</span>(n<span class="op">/</span>(n<span class="op">-</span>p))</code></pre>
+<p>And here starts the bootstrap loop, see Katrien’s lecture notes for explanation and schematic overview.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># initialize the random number generator</span>
+<span class="kw">set.seed</span>(<span class="dv">6345789</span>)
+
+<span class="co"># i and j as factor variables</span>
+i &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>TT, TT<span class="op">:</span><span class="dv">1</span>); i &lt;-<span class="st"> </span><span class="kw">as.factor</span>(i)
+j &lt;-<span class="st"> </span><span class="kw">sequence</span>(TT<span class="op">:</span><span class="dv">1</span>); j &lt;-<span class="st"> </span><span class="kw">as.factor</span>(j)
+
+<span class="co"># run the bootstrap loop many times, eg 10000 times</span>
+nBoot &lt;-<span class="st"> </span><span class="dv">10000</span>
+payments &lt;-<span class="st"> </span><span class="kw">numeric</span>(nBoot)
+
+<span class="cf">for</span>(boots <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nBoot){  ## start of the bootstrap loop
+    <span class="co"># Step 1: resample from the adjusted residuals, with replacement</span>
+    Ps.Xij &lt;-<span class="st"> </span><span class="kw">sample</span>(Adj.Prs.resid, n, <span class="dt">replace=</span><span class="ot">TRUE</span>)
+    <span class="co"># Step 2: using this set of residuals and the estimated values of \hat{\mu_{ij}}</span>
+    <span class="co"># create a new suitable pseudo-history</span>
+    Ps.Xij &lt;-<span class="st"> </span>Ps.Xij<span class="op">*</span><span class="kw">sqrt</span>(<span class="kw">fitted</span>(poi_glm_od))<span class="op">+</span><span class="kw">fitted</span>(poi_glm_od)
+    Ps.Xij &lt;-<span class="st"> </span><span class="kw">pmax</span>(Ps.Xij, <span class="dv">0</span>) 
+    <span class="co"># Step 3: from this history, estimate \alpha_i, beta_j</span>
+    Ps.CL &lt;-<span class="st"> </span><span class="kw">glm</span>(Ps.Xij <span class="op">~</span><span class="st"> </span>i <span class="op">+</span><span class="st"> </span>j, quasipoisson)
+    coefs &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">as.numeric</span>(<span class="kw">coef</span>(Ps.CL)))
+    Ps.alpha &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, coefs[<span class="dv">2</span><span class="op">:</span>TT])<span class="op">*</span>coefs[<span class="dv">1</span>]
+    Ps.beta &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, coefs[(TT<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>TT<span class="dv">-1</span>)])
+    <span class="co"># Step 4: compute fitted values, use sum of future part as an estimate of the reserve</span>
+    Ps.fits &lt;-<span class="st"> </span>Ps.alpha<span class="op">%*%</span><span class="kw">t</span>(Ps.beta)
+    Ps.reserve &lt;-<span class="st"> </span><span class="kw">sum</span>(Ps.fits[future])
+    <span class="co"># Step 5: </span>
+    Ps.totpayments &lt;-<span class="st"> </span>phi.P<span class="op">*</span><span class="kw">rpois</span>(<span class="dv">1</span>, Ps.reserve<span class="op">/</span>phi.P)
+    <span class="co"># Step 6:</span>
+    payments[boots] &lt;-<span class="st"> </span>Ps.totpayments
+}
+<span class="kw">min</span>(payments)</code></pre>
+<pre><code>## [1] 7416792</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">max</span>(payments)</code></pre>
+<pre><code>## [1] 31981628</code></pre>
+<p>You extract useful summaries from the results stored in <code>payments</code> as follows.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">quantile</span>(payments, <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.99</span>), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre>
+<pre><code>##      50%      75%      90%      95%      99% 
+## 18673483 20672335 22671187 23986221 26826694</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(payments)</code></pre>
+<pre><code>## [1] 18848278</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(payments)</code></pre>
+<pre><code>## [1] 2968997</code></pre>
+<p>And plots</p>
+<pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">data.frame</span>(payments)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">ggplot</span>(<span class="dt">data=</span>d, <span class="kw">aes</span>(payments)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">col =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Histogram for Bootstrap Reserves&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Reserves&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Count&quot;</span>) </code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>The <code>ChainLadder</code> package also has useful functions to set up bootstrap simulations.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
+B &lt;-<span class="st"> </span><span class="kw">BootChainLadder</span>(GenIns, <span class="dt">R =</span> <span class="dv">10000</span>, <span class="dt">process.distr =</span> <span class="st">&quot;od.pois&quot;</span>)
+B</code></pre>
+<pre><code>## BootChainLadder(Triangle = GenIns, R = 10000, process.distr = &quot;od.pois&quot;)
+## 
+##       Latest Mean Ultimate Mean IBNR  IBNR.S.E  IBNR 75%  IBNR 95%
+## 1  3,901,463     3,901,463         0         0         0         0
+## 2  5,339,085     5,435,471    96,386   113,603   149,138   312,621
+## 3  4,909,315     5,380,702   471,387   217,453   598,149   864,988
+## 4  4,588,268     5,305,145   716,877   261,068   876,808 1,179,647
+## 5  3,873,311     4,864,352   991,041   307,441 1,179,230 1,542,424
+## 6  3,691,712     5,126,756 1,435,044   380,790 1,673,438 2,107,963
+## 7  3,483,130     5,673,303 2,190,173   497,466 2,509,815 3,058,627
+## 8  2,864,498     6,815,226 3,950,728   796,044 4,445,624 5,355,080
+## 9  1,363,294     5,684,146 4,320,852 1,064,740 4,952,187 6,209,475
+## 10   344,014     5,043,687 4,699,673 2,018,504 5,899,153 8,156,800
+## 
+##                     Totals
+## Latest:         34,358,090
+## Mean Ultimate:  53,230,252
+## Mean IBNR:      18,872,162
+## IBNR.S.E         3,001,662
+## Total IBNR 75%: 20,761,090
+## Total IBNR 95%: 24,064,106</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(B)</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># some attributes o</span>
+B<span class="op">$</span>Triangle</code></pre>
+<pre><code>##       dev
+## origin      1       2       3       4       5       6       7       8
+##     1  357848 1124788 1735330 2218270 2745596 3319994 3466336 3606286
+##     2  352118 1236139 2170033 3353322 3799067 4120063 4647867 4914039
+##     3  290507 1292306 2218525 3235179 3985995 4132918 4628910 4909315
+##     4  310608 1418858 2195047 3757447 4029929 4381982 4588268      NA
+##     5  443160 1136350 2128333 2897821 3402672 3873311      NA      NA
+##     6  396132 1333217 2180715 2985752 3691712      NA      NA      NA
+##     7  440832 1288463 2419861 3483130      NA      NA      NA      NA
+##     8  359480 1421128 2864498      NA      NA      NA      NA      NA
+##     9  376686 1363294      NA      NA      NA      NA      NA      NA
+##     10 344014      NA      NA      NA      NA      NA      NA      NA
+##       dev
+## origin       9      10
+##     1  3833515 3901463
+##     2  5339085      NA
+##     3       NA      NA
+##     4       NA      NA
+##     5       NA      NA
+##     6       NA      NA
+##     7       NA      NA
+##     8       NA      NA
+##     9       NA      NA
+##     10      NA      NA</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">B<span class="op">$</span>f</code></pre>
+<pre><code>##  [1] 3.490607 1.747333 1.457413 1.173852 1.103824 1.086269 1.053874
+##  [8] 1.076555 1.017725 1.000000</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">B<span class="op">$</span>IBNR.Totals[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]</code></pre>
+<pre><code>##  [1] 21398909 17870368 17597508 18428981 19512320 19606687 15880725
+##  [8] 22244763 19325943 17354310</code></pre>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="glm-analysis-of-a-run-off-triangle.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="more-info.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
